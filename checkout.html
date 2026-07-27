@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Secure Checkout - Strawberry Cold-Pressed Juice. Order fresh organic cold-pressed strawberry juice.">
+  <meta name="theme-color" content="#08080a">
+  <title>STRAWBERRY — Secure Checkout & Order</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍓</text></svg>">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body class="checkout-body">
+
+  <!-- Header -->
+  <header class="navbar">
+    <a href="./index.html" class="brand-logo">
+      <span class="brand-badge"></span>
+      <span class="brand-name">STRAWBERRY</span>
+    </a>
+    
+    <div class="nav-actions">
+      <a href="./index.html" class="btn-secondary-link">&larr; Back to Experience</a>
+    </div>
+  </header>
+
+  <!-- Checkout Container -->
+  <main class="checkout-main">
+    <div class="checkout-header-banner">
+      <span class="checkout-tag">OFFICIAL BATCH RESERVATION</span>
+      <h1 class="checkout-title">Complete Your Fresh Batch Order</h1>
+      <p class="checkout-subtitle">Cold-pressed daily from 100% organic strawberries. Guaranteed Express Delivery within 1 hour.</p>
+    </div>
+
+    <div class="checkout-grid">
+      
+      <!-- Left Column: Checkout Forms -->
+      <div class="checkout-forms-col">
+        
+        <!-- Step 1: Select Pack Size -->
+        <section class="checkout-card">
+          <div class="card-step-header">
+            <span class="step-num">1</span>
+            <h2>Select Package Size</h2>
+          </div>
+
+          <div class="pack-selector-grid">
+            <div class="pack-option active" data-pack="single" data-price="5">
+              <div class="pack-header">
+                <span class="pack-name">Single Bottle</span>
+                <span class="pack-badge">250ml Glass</span>
+              </div>
+              <div class="pack-price">5 QAR</div>
+              <p class="pack-desc">Pure refreshing daily cold-pressed strawberry boost.</p>
+            </div>
+
+            <div class="pack-option" data-pack="six" data-price="25">
+              <div class="pack-header">
+                <span class="pack-name">6-Pack Studio Box</span>
+                <span class="pack-badge save">SAVE 17%</span>
+              </div>
+              <div class="pack-price">25 QAR</div>
+              <p class="pack-desc">6 x 250ml chilled bottles in insulated packaging.</p>
+            </div>
+
+            <div class="pack-option" data-pack="twelve" data-price="45">
+              <div class="pack-header">
+                <span class="pack-name">12-Pack Master Case</span>
+                <span class="pack-badge save">SAVE 25%</span>
+              </div>
+              <div class="pack-price">45 QAR</div>
+              <p class="pack-desc">12 x 250ml full case. Free express chilled shipping included.</p>
+            </div>
+          </div>
+
+          <!-- Quantity Selector -->
+          <div class="quantity-control-row">
+            <span class="qty-label">Quantity (Boxes / Packs):</span>
+            <div class="qty-stepper">
+              <button type="button" class="qty-btn" id="btn-qty-minus" aria-label="Decrease Quantity">-</button>
+              <span class="qty-val" id="qty-val">1</span>
+              <button type="button" class="qty-btn" id="btn-qty-plus" aria-label="Increase Quantity">+</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Step 2: Delivery Details -->
+        <section class="checkout-card">
+          <div class="card-step-header">
+            <span class="step-num">2</span>
+            <h2>Shipping & Delivery Address</h2>
+          </div>
+
+          <form id="shipping-form" class="checkout-form-grid">
+            <div class="form-group span-2">
+              <label for="ship-fullname">Full Name *</label>
+              <input type="text" id="ship-fullname" class="form-input" placeholder="Jane Doe" required>
+            </div>
+
+            <div class="form-group">
+              <label for="ship-email">Email Address *</label>
+              <input type="email" id="ship-email" class="form-input" placeholder="jane@example.com" required>
+            </div>
+
+            <div class="form-group">
+              <label for="ship-phone">Phone Number *</label>
+              <input type="tel" id="ship-phone" class="form-input" placeholder="+974 5512 3456" required>
+            </div>
+
+            <div class="form-group span-2">
+              <label for="ship-address">Street Address / Zone *</label>
+              <input type="text" id="ship-address" class="form-input" placeholder="West Bay, Diplomatic Area" required>
+            </div>
+
+            <div class="form-group">
+              <label for="ship-city">City *</label>
+              <input type="text" id="ship-city" class="form-input" placeholder="Doha" required>
+            </div>
+
+            <div class="form-group">
+              <label for="ship-zip">Building / Villa No. *</label>
+              <input type="text" id="ship-zip" class="form-input" placeholder="Building 42, Street 890" required>
+            </div>
+          </form>
+        </section>
+
+        <!-- Step 3: Payment Method -->
+        <section class="checkout-card">
+          <div class="card-step-header">
+            <span class="step-num">3</span>
+            <h2>Payment Method</h2>
+          </div>
+
+          <div class="payment-methods">
+            <label class="pay-method-option active">
+              <input type="radio" name="payment-method" value="Card" checked>
+              <span>Credit / Debit Card</span>
+            </label>
+            <label class="pay-method-option">
+              <input type="radio" name="payment-method" value="COD">
+              <span>Cash on Delivery (COD)</span>
+            </label>
+          </div>
+
+          <!-- Card Details Form -->
+          <div id="card-details-section" class="checkout-form-grid" style="margin-top: 20px;">
+            <div class="form-group span-2">
+              <label for="card-number">Card Number *</label>
+              <input type="text" id="card-number" class="form-input" placeholder="4532 •••• •••• 8924" maxlength="19" required>
+            </div>
+
+            <div class="form-group">
+              <label for="card-expiry">Expiry Date *</label>
+              <input type="text" id="card-expiry" class="form-input" placeholder="MM/YY" maxlength="5" required>
+            </div>
+
+            <div class="form-group">
+              <label for="card-cvv">Security Code (CVV) *</label>
+              <input type="password" id="card-cvv" class="form-input" placeholder="123" maxlength="4" required>
+            </div>
+
+            <div class="form-group span-2">
+              <label for="card-holder">Cardholder Name *</label>
+              <input type="text" id="card-holder" class="form-input" placeholder="JANE DOE" required>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- Right Column: Order Summary Sidebar -->
+      <div class="checkout-sidebar-col">
+        <div class="order-summary-card">
+          <h3 class="summary-title">Order Summary</h3>
+
+          <div class="summary-product-item">
+            <img src="./00036.png" alt="Strawberry Cold-Pressed Bottle" class="summary-thumb">
+            <div class="summary-prod-details">
+              <h4 id="summary-prod-title">Single Bottle (250ml)</h4>
+              <p class="summary-prod-sub">100% Organic Strawberry Puree</p>
+              <span class="summary-prod-qty" id="summary-prod-qty">Qty: 1</span>
+            </div>
+            <div class="summary-prod-price" id="summary-prod-price">5 QAR</div>
+          </div>
+
+          <div class="summary-divider"></div>
+
+          <div class="summary-row">
+            <span>Subtotal</span>
+            <span id="summary-subtotal">5 QAR</span>
+          </div>
+
+          <div class="summary-row">
+            <span>Chilled Insulated Shipping</span>
+            <span id="summary-shipping">3 QAR</span>
+          </div>
+
+          <div class="summary-row">
+            <span>Estimated Taxes</span>
+            <span id="summary-tax">0 QAR</span>
+          </div>
+
+          <div class="summary-divider"></div>
+
+          <div class="summary-total-row">
+            <span>Total Due</span>
+            <span class="total-price" id="summary-total">8 QAR</span>
+          </div>
+
+          <div id="checkout-alert" class="auth-alert" style="display: none; margin-top: 16px;"></div>
+
+          <button class="btn-primary btn-checkout-submit" id="btn-place-order">
+            PLACE ORDER &amp; PAY NOW
+          </button>
+
+          <div class="security-guarantee">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+            <span>256-Bit SSL Encrypted &amp; Temperature Controlled Guarantee</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Confirmation Modal -->
+  <div id="order-confirm-modal" class="modal-overlay" aria-hidden="true">
+    <div class="modal-card confirmation-card">
+      <div class="success-icon-badge">
+        <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+          <path d="M5 13l4 4L19 7"/>
+        </svg>
+      </div>
+
+      <span class="modal-brand">STRAWBERRY</span>
+      <h2 class="modal-title">Order Confirmed!</h2>
+      <p class="modal-subtitle">Thank you for choosing STRAWBERRY Cold-Pressed.</p>
+
+      <div class="receipt-box">
+        <div class="receipt-row">
+          <span>Order Number:</span>
+          <strong id="rec-order-id">#STR-89241</strong>
+        </div>
+        <div class="receipt-row">
+          <span>Estimated Delivery:</span>
+          <strong id="rec-delivery">Tomorrow by 5 PM</strong>
+        </div>
+        <div class="receipt-row">
+          <span>Customer:</span>
+          <strong id="rec-customer">Jane Doe</strong>
+        </div>
+        <div class="receipt-row">
+          <span>Shipping Address:</span>
+          <span id="rec-address" style="text-align: right;">742 Evergreen Terrace</span>
+        </div>
+        <div class="receipt-row total-receipt">
+          <span>Total Paid:</span>
+          <strong id="rec-total">$11.54</strong>
+        </div>
+      </div>
+
+      <a href="./index.html" class="btn-primary btn-full-width">Return to Main Experience</a>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="checkout-footer">
+    <p>&copy; 2026 STRAWBERRY Beverages Inc. All rights reserved.</p>
+  </footer>
+
+  <script src="./checkout.js"></script>
+</body>
+</html>

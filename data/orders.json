@@ -1,0 +1,110 @@
+[
+  {
+    "orderId": "STR-474305",
+    "createdAt": "2026-07-27T15:52:57.773Z",
+    "estimatedDelivery": "Wednesday, Jul 29",
+    "items": [
+      {
+        "pack": "six",
+        "title": "6-Pack Studio Box",
+        "quantity": 2,
+        "unitPrice": 34.99
+      }
+    ],
+    "customer": {
+      "fullName": "Jane Doe",
+      "email": "jane@example.com",
+      "phone": "+1 (555) 019-2834",
+      "address": "742 Evergreen Terrace",
+      "city": "Los Angeles",
+      "zip": "90001"
+    },
+    "payment": {
+      "method": "Card",
+      "status": "Paid",
+      "cardLast4": "8924"
+    },
+    "status": "Confirmed"
+  },
+  {
+    "orderId": "STR-344541",
+    "createdAt": "2026-07-27T17:00:35.735Z",
+    "estimatedDelivery": "Wednesday, Jul 29",
+    "items": [
+      {
+        "pack": "single",
+        "title": "Single Bottle (250ml)",
+        "quantity": 1,
+        "unitPrice": 5
+      }
+    ],
+    "customer": {
+      "fullName": "Test UserTest User",
+      "email": "test@example.comtestuser@example.com",
+      "phone": "+974 5555 1234",
+      "address": "123 Al Corniche St",
+      "city": "Doha",
+      "zip": "Building 50, Floor 4"
+    },
+    "payment": {
+      "method": "Card",
+      "status": "Paid",
+      "cardLast4": "4242"
+    },
+    "status": "Confirmed"
+  },
+  {
+    "orderId": "STR-819537",
+    "createdAt": "2026-07-27T19:52:27.196Z",
+    "estimatedDelivery": "Express Chilled Delivery within 1 hour",
+    "items": [
+      {
+        "pack": "six",
+        "title": "6-Pack Studio Box",
+        "quantity": 10,
+        "unitPrice": 25
+      }
+    ],
+    "customer": {
+      "fullName": "shafi",
+      "email": "shafi@123gmail.com",
+      "phone": "974 55550000",
+      "address": "al markhiya",
+      "city": "doha",
+      "zip": "90"
+    },
+    "payment": {
+      "method": "COD",
+      "status": "Paid",
+      "cardLast4": "ery)"
+    },
+    "status": "Confirmed"
+  },
+  {
+    "orderId": "STR-871486",
+    "createdAt": "2026-07-27T20:25:12.239Z",
+    "estimatedDelivery": "Express Chilled Delivery within 1 hour",
+    "items": [
+      {
+        "pack": "twelve",
+        "title": "12-Pack Master Case",
+        "quantity": 10,
+        "unitPrice": 45
+      }
+    ],
+    "customer": {
+      "fullName": "izza",
+      "email": "izza@gmail.com",
+      "phone": "97411223344",
+      "address": "west bay",
+      "city": "doha",
+      "zip": "98"
+    },
+    "payment": {
+      "method": "Card",
+      "status": "Paid",
+      "cardLast4": "9876"
+    },
+    "status": "Confirmed"
+  }
+]
