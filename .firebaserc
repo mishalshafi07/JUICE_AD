@@ -1,5 +1,7 @@
 {
-  "projects": {},
+  "projects": {
+    "default": "juiceads-95d22"
+  },
   "targets": {},
   "etags": {}
 }

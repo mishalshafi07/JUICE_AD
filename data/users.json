@@ -71,5 +71,14 @@
     "salt": "b789bf93b49d49f5a163a952fca9b029",
     "password": "e7d4af489805f4fa430302ea11a9b79236755288d2d653729b05be0d1d0852e3c1958bfd9122bda32e7d89936d15176461132c5eac78e860cddb89b66b7ba854",
     "createdAt": "2026-07-27T21:10:21.821Z"
+  },
+  {
+    "id": "usr_1785240413311",
+    "fullName": "ruknu",
+    "email": "ruknu@gmail.com",
+    "phone": "974 56785678",
+    "salt": "8499de4ec0c1a62634f2ace30acaff25",
+    "password": "56ad9c9e26f002421ec90cd98993a37bc6317752fc762802d33e10a91b2f39742cc2f32ba1fcbf80d6b392ec19b5dec2511b29f8a1651e29c00f288f03dd8f60",
+    "createdAt": "2026-07-28T12:06:53.311Z"
   }
 ]
