@@ -143,24 +143,13 @@ document.addEventListener('DOMContentLoaded', () => {
       // ----------------------------------------------------------------------
       // MOBILE & PORTRAIT: Full-screen vertical advertisement composition
       // ----------------------------------------------------------------------
-      // On portrait screens, the juice product occupies the vertical viewport (9:16 framing).
-      // The juice bottle is centered horizontally, significantly larger & visually dominant.
-      const navSpace = canvasWidth <= 768 ? 44 : 54;
-
-      if (canvasRatio <= 0.65) {
-        // Smartphones (typically 9:16 to 9:20.5 portrait)
-        renderH = Math.max(canvasHeight * 0.94, canvasWidth * (16 / 9));
-        renderW = renderH * imgRatio;
-        renderX = (canvasWidth - renderW) / 2;
-        // Position vertically so bottle cap sits comfortably below mobile header
-        renderY = Math.max(10, (canvasHeight - renderH) / 2 + navSpace * 0.35);
-      } else {
-        // Tablets in portrait (e.g. 768x1024, ratio ~0.75)
-        renderH = canvasHeight * 0.92;
-        renderW = renderH * imgRatio;
-        renderX = (canvasWidth - renderW) / 2;
-        renderY = (canvasHeight - renderH) / 2;
-      }
+      // In portrait orientation, the animation covers the full vertical screen
+      // so the juice product fills the mobile viewport like a full-screen vertical ad.
+      // Zero landscape letterbox, zero empty margins, 100% full-screen immersive.
+      renderH = Math.max(canvasHeight, canvasWidth * (16 / 9));
+      renderW = renderH * imgRatio;
+      renderX = (canvasWidth - renderW) / 2;
+      renderY = (canvasHeight - renderH) / 2;
     }
 
     // Soft reflective floor gradient glow (anchored relative to bottle base)
