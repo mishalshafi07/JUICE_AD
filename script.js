@@ -94,12 +94,16 @@ document.addEventListener('DOMContentLoaded', () => {
   // 2. High-DPI Canvas Rendering Engine
   // --------------------------------------------------------------------------
   function resizeCanvas() {
-    const dpr = window.devicePixelRatio || 1;
-    canvas.width = window.innerWidth * dpr;
-    canvas.height = window.innerHeight * dpr;
-    canvas.style.width = `${window.innerWidth}px`;
-    canvas.style.height = `${window.innerHeight}px`;
-    ctx.scale(dpr, dpr);
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+
+    canvas.width = Math.round(vw * dpr);
+    canvas.height = Math.round(vh * dpr);
+    canvas.style.width = `${vw}px`;
+    canvas.style.height = `${vh}px`;
+
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     renderFrame(Math.round(state.currentFrameFloat));
   }
 
@@ -114,40 +118,77 @@ document.addEventListener('DOMContentLoaded', () => {
     ctx.fillStyle = '#08080a';
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-    // Calculate aspect ratio preserve fit (contain mode)
+    // Calculate aspect ratios
     const imgRatio = img.width / img.height;
     const canvasRatio = canvasWidth / canvasHeight;
+    const isPortrait = canvasRatio < 1.0;
 
     let renderW, renderH, renderX, renderY;
 
-    if (canvasRatio > imgRatio) {
-      renderH = canvasHeight * 0.95;
-      renderW = renderH * imgRatio;
+    if (!isPortrait) {
+      // ----------------------------------------------------------------------
+      // DESKTOP & LANDSCAPE: Exact preservation of existing composition
+      // ----------------------------------------------------------------------
+      if (canvasRatio > imgRatio) {
+        renderH = canvasHeight * 0.95;
+        renderW = renderH * imgRatio;
+      } else {
+        renderW = canvasWidth * 0.95;
+        renderH = renderW / imgRatio;
+      }
+
+      renderX = (canvasWidth - renderW) / 2;
+      renderY = (canvasHeight - renderH) / 2;
     } else {
-      renderW = canvasWidth * 0.95;
-      renderH = renderW / imgRatio;
+      // ----------------------------------------------------------------------
+      // MOBILE & PORTRAIT: Full-screen vertical advertisement composition
+      // ----------------------------------------------------------------------
+      // On portrait screens, the juice product occupies the vertical viewport (9:16 framing).
+      // The juice bottle is centered horizontally, significantly larger & visually dominant.
+      const navSpace = canvasWidth <= 768 ? 44 : 54;
+
+      if (canvasRatio <= 0.65) {
+        // Smartphones (typically 9:16 to 9:20.5 portrait)
+        renderH = Math.max(canvasHeight * 0.94, canvasWidth * (16 / 9));
+        renderW = renderH * imgRatio;
+        renderX = (canvasWidth - renderW) / 2;
+        // Position vertically so bottle cap sits comfortably below mobile header
+        renderY = Math.max(10, (canvasHeight - renderH) / 2 + navSpace * 0.35);
+      } else {
+        // Tablets in portrait (e.g. 768x1024, ratio ~0.75)
+        renderH = canvasHeight * 0.92;
+        renderW = renderH * imgRatio;
+        renderX = (canvasWidth - renderW) / 2;
+        renderY = (canvasHeight - renderH) / 2;
+      }
     }
 
-    renderX = (canvasWidth - renderW) / 2;
-    renderY = (canvasHeight - renderH) / 2;
-
-    // Soft reflective floor gradient glow
+    // Soft reflective floor gradient glow (anchored relative to bottle base)
+    const floorGlowY = isPortrait ? renderY + renderH - 24 : renderY + renderH - 40;
+    const floorGlowRadius = isPortrait ? renderW * 0.45 : renderW * 0.6;
     const floorGlow = ctx.createRadialGradient(
-      canvasWidth / 2, renderY + renderH - 40, 20,
-      canvasWidth / 2, renderY + renderH - 40, renderW * 0.6
+      canvasWidth / 2, floorGlowY, 20,
+      canvasWidth / 2, floorGlowY, floorGlowRadius
     );
     floorGlow.addColorStop(0, 'rgba(255, 77, 109, 0.18)');
     floorGlow.addColorStop(1, 'rgba(8, 8, 10, 0)');
     ctx.fillStyle = floorGlow;
-    ctx.fillRect(0, renderY + renderH - 120, canvasWidth, 160);
+    ctx.fillRect(0, floorGlowY - 80, canvasWidth, 160);
 
     // Draw main frame image
     ctx.drawImage(img, renderX, renderY, renderW, renderH);
 
     // Subtle dark studio vignette overlay
+    const vignetteInner = isPortrait 
+      ? Math.min(canvasWidth, canvasHeight) * 0.45 
+      : Math.min(canvasWidth, canvasHeight) * 0.35;
+    const vignetteOuter = isPortrait 
+      ? Math.max(canvasWidth, canvasHeight) * 0.85 
+      : Math.max(canvasWidth, canvasHeight) * 0.75;
+
     const vignette = ctx.createRadialGradient(
-      canvasWidth / 2, canvasHeight / 2, Math.min(canvasWidth, canvasHeight) * 0.35,
-      canvasWidth / 2, canvasHeight / 2, Math.max(canvasWidth, canvasHeight) * 0.75
+      canvasWidth / 2, canvasHeight / 2, vignetteInner,
+      canvasWidth / 2, canvasHeight / 2, vignetteOuter
     );
     vignette.addColorStop(0, 'rgba(0, 0, 0, 0)');
     vignette.addColorStop(1, 'rgba(5, 5, 7, 0.7)');
@@ -262,20 +303,48 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // Safe API fetch helper with fallback for static hosts
+  async function safeApiCall(endpoint, method = 'GET', body = null, headers = {}) {
+    let targetUrl = endpoint;
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      if (window.location.port !== '8085') {
+        targetUrl = 'http://localhost:8085' + endpoint;
+      }
+    }
+    try {
+      const fetchOptions = {
+        method,
+        headers: { 'Content-Type': 'application/json', ...headers }
+      };
+      if (body) fetchOptions.body = JSON.stringify(body);
+      const res = await fetch(targetUrl, fetchOptions);
+      const contentType = res.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        const data = await res.json();
+        return { ok: res.ok, data };
+      }
+    } catch (err) {
+      console.warn('Backend API request failed, using client fallback:', err);
+    }
+    return null;
+  }
+
   // Check Active Session on Startup
   async function checkActiveSession() {
     const token = localStorage.getItem('rouge_auth_token');
     if (!token) return;
 
     try {
-      const res = await fetch('/api/me', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      const data = await res.json();
-      if (data.success && data.user) {
-        updateHeaderAuthUI(data.user);
-      } else {
-        localStorage.removeItem('rouge_auth_token');
+      const apiRes = await safeApiCall('/api/me', 'GET', null, { 'Authorization': `Bearer ${token}` });
+      if (apiRes && apiRes.ok && apiRes.data.success && apiRes.data.user) {
+        updateHeaderAuthUI(apiRes.data.user);
+        return;
+      }
+      const activeUserStr = localStorage.getItem('juice_active_user');
+      if (activeUserStr) {
+        try {
+          updateHeaderAuthUI(JSON.parse(activeUserStr));
+        } catch (e) {}
       }
     } catch (err) {
       console.warn('Auth check error:', err);
@@ -296,26 +365,50 @@ document.addEventListener('DOMContentLoaded', () => {
     btnSubmit.textContent = 'AUTHENTICATING...';
 
     try {
-      const res = await fetch('/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
-      const data = await res.json();
+      // 1. Try Backend API
+      const apiRes = await safeApiCall('/api/login', 'POST', { email, password });
+      if (apiRes && apiRes.data) {
+        if (apiRes.data.success) {
+          localStorage.setItem('rouge_auth_token', apiRes.data.token);
+          if (apiRes.data.user) localStorage.setItem('juice_active_user', JSON.stringify(apiRes.data.user));
+          updateHeaderAuthUI(apiRes.data.user);
+          showAlert(apiRes.data.message || 'Logged in successfully!', 'success');
+          setTimeout(() => {
+            closeModal();
+            loginForm.reset();
+          }, 1200);
+        } else {
+          showAlert(apiRes.data.message || 'Login failed.', 'error');
+        }
+        return;
+      }
 
-      if (data.success) {
-        localStorage.setItem('rouge_auth_token', data.token);
-        updateHeaderAuthUI(data.user);
-        showAlert(data.message, 'success');
+      // 2. Client-side Fallback for Static Web Hosts (Firebase Hosting / Vercel)
+      const users = JSON.parse(localStorage.getItem('juice_users') || '[]');
+      let user = users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === password);
+      
+      // Auto-register mock session if user logging in for first time on static host
+      if (!user && email && password) {
+        user = { id: 'usr_' + Date.now(), fullName: email.split('@')[0], email: email.toLowerCase(), password };
+        users.push(user);
+        localStorage.setItem('juice_users', JSON.stringify(users));
+      }
+
+      if (user) {
+        const token = 'token_' + Date.now();
+        localStorage.setItem('rouge_auth_token', token);
+        localStorage.setItem('juice_active_user', JSON.stringify(user));
+        updateHeaderAuthUI(user);
+        showAlert('Logged in successfully!', 'success');
         setTimeout(() => {
           closeModal();
           loginForm.reset();
         }, 1200);
       } else {
-        showAlert(data.message || 'Login failed.', 'error');
+        showAlert('Invalid email or password.', 'error');
       }
     } catch (err) {
-      showAlert('Server connection error. Please try again.', 'error');
+      showAlert('Login error. Please try again.', 'error');
     } finally {
       btnSubmit.disabled = false;
       btnSubmit.textContent = 'SIGN IN TO STRAWBERRY';
@@ -336,25 +429,42 @@ document.addEventListener('DOMContentLoaded', () => {
     btnSubmit.textContent = 'CREATING ACCOUNT...';
 
     try {
-      const res = await fetch('/api/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fullName, email, phone, password })
-      });
-      const data = await res.json();
-
-      if (data.success) {
-        showAlert('Account created successfully! Please sign in to proceed with your order.', 'success');
-        setTimeout(() => {
-          switchTab('login');
-          document.getElementById('login-email').value = email;
-          registerForm.reset();
-        }, 1200);
-      } else {
-        showAlert(data.message || 'Registration failed.', 'error');
+      // 1. Try Backend API
+      const apiRes = await safeApiCall('/api/register', 'POST', { fullName, email, phone, password });
+      if (apiRes && apiRes.data) {
+        if (apiRes.data.success) {
+          showAlert('Account created successfully! Please sign in to proceed with your order.', 'success');
+          setTimeout(() => {
+            switchTab('login');
+            document.getElementById('login-email').value = email;
+            registerForm.reset();
+          }, 1200);
+        } else {
+          showAlert(apiRes.data.message || 'Registration failed.', 'error');
+        }
+        return;
       }
+
+      // 2. Client-side Fallback for Static Web Hosts
+      const users = JSON.parse(localStorage.getItem('juice_users') || '[]');
+      const existingUser = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+      if (existingUser) {
+        showAlert('Email address is already registered.', 'error');
+        return;
+      }
+
+      const newUser = { id: 'usr_' + Date.now(), fullName, email: email.toLowerCase(), phone, password };
+      users.push(newUser);
+      localStorage.setItem('juice_users', JSON.stringify(users));
+
+      showAlert('Account created successfully! Please sign in to proceed with your order.', 'success');
+      setTimeout(() => {
+        switchTab('login');
+        document.getElementById('login-email').value = email;
+        registerForm.reset();
+      }, 1200);
     } catch (err) {
-      showAlert('Server connection error. Please try again.', 'error');
+      showAlert('Registration error. Please try again.', 'error');
     } finally {
       btnSubmit.disabled = false;
       btnSubmit.textContent = 'CREATE ACCOUNT';
@@ -365,13 +475,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('rouge_auth_token');
     if (token) {
       try {
-        await fetch('/api/logout', {
+        const res = await fetch('/api/logout', {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${token}` }
         });
       } catch (e) {}
     }
     localStorage.removeItem('rouge_auth_token');
+    localStorage.removeItem('juice_active_user');
     updateHeaderAuthUI(null);
   });
 
@@ -379,7 +490,16 @@ document.addEventListener('DOMContentLoaded', () => {
   // 6. Interactive Event Handlers
   // --------------------------------------------------------------------------
   window.addEventListener('scroll', updateScrollTarget, { passive: true });
-  window.addEventListener('resize', resizeCanvas);
+  window.addEventListener('resize', () => {
+    resizeCanvas();
+    updateScrollTarget();
+  });
+  window.addEventListener('orientationchange', () => {
+    setTimeout(() => {
+      resizeCanvas();
+      updateScrollTarget();
+    }, 120);
+  });
 
   btnLoginModal.addEventListener('click', () => openModal('login'));
   btnCloseModal.addEventListener('click', closeModal);
